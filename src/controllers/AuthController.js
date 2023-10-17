@@ -5,22 +5,28 @@ require("dotenv").config();
 const jwtGenerator = require("../utils/jwt-generator");
 const transporter = require("../utils/transporter");
 
+const ROLE = {
+  khuyen_nong_co_so: 2,
+  nha_nong: 3,
+  ky_thuat_vien_thu_y: 4,
+};
+
 exports.store = async (req, res) => {
   try {
-    const { name, mobile, password } = req.body;
+    const { name, mobile, password, role } = req.body;
     const old_user = await User.findOne({ where: { mobile: mobile } });
     if (old_user) {
       return res
         .status(401)
-        .json({ status: 401, error: "Tài khoản đã tồn tại" });
+        .json({ status: 401, error: "Số điện thoại đã được đăng ký" });
     }
     const salt = await bcrypt.genSalt(12);
     const hashed_password = await bcrypt.hash(password, salt);
-
     const new_user = await User.create({
       name,
       mobile,
       password: hashed_password,
+      role: ROLE[role],
     });
     res.status(200).json({
       status: 200,
@@ -42,7 +48,9 @@ exports.login = async (req, res) => {
       where: { mobile: mobile },
     });
     if (!user) {
-      return res.status(401).json({ status: 401, error: "Tài khoản hoặc mật khẩu không đúng" });
+      return res
+        .status(401)
+        .json({ status: 401, error: "Tài khoản hoặc mật khẩu không đúng" });
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -51,9 +59,11 @@ exports.login = async (req, res) => {
         .json({ status: 401, message: "Tài khoản hoặc mật khẩu không đúng" });
     }
     const token = jwtGenerator(user.id);
-    return res
-      // .cookie("token", token, { httpOnly: true })
-      .json({ status: 200, message: "Success", token: token });
+    return (
+      res
+        // .cookie("token", token, { httpOnly: true })
+        .json({ status: 200, message: "Success", token: token })
+    );
   } catch (err) {
     console.error(err.message);
     res.status(500).json({
