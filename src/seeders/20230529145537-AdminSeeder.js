@@ -21,7 +21,7 @@ module.exports = {
         {
           id: uuidv4(),
           name: "Đức Trọng",
-          mobile: "035589853",
+          mobile: "0355898753",
           email: "ductronglu0411@gmail.com",
           password: hashed_password,
           role_id: 1,

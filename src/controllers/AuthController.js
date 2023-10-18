@@ -37,12 +37,14 @@ exports.store = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { mobile, password } = req.body;
+    const { mobile, password, role } = req.body;
     const user = await User.findOne({
       where: { mobile: mobile },
     });
     if (!user) {
-      return res.status(401).json({ status: 401, error: "Tài khoản hoặc mật khẩu không đúng" });
+      return res
+        .status(401)
+        .json({ status: 401, message: "Tài khoản hoặc mật khẩu không đúng" });
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -51,9 +53,11 @@ exports.login = async (req, res) => {
         .json({ status: 401, message: "Tài khoản hoặc mật khẩu không đúng" });
     }
     const token = jwtGenerator(user.id);
-    return res
-      // .cookie("token", token, { httpOnly: true })
-      .json({ status: 200, message: "Success", token: token });
+    return (
+      res
+        // .cookie("token", token, { httpOnly: true })
+        .json({ status: 200, message: "Success", token: token })
+    );
   } catch (err) {
     console.error(err.message);
     res.status(500).json({
@@ -167,13 +171,15 @@ exports.getUserInfo = async (req, res) => {
 
 exports.checkToken = async (req, res) => {
   try {
-    const token = req.cookies.token;
+    const { token } = req.body;
     const verify = jwt.verify(token, process.env.JWT_SECRET);
     const currentTime = Math.floor(Date.now() / 1000);
     if (verify.exp > currentTime) {
-      return res.status(200).json(true);
+      return res.status(200).json({ status: 200, message: "Thành công" });
     }
-    return res.status(200).json(false);
+    return res
+      .status(401)
+      .json({ status: 401, message: "Hết phiên đăng nhập" });
   } catch (err) {
     console.error(err.message);
     res.status(500).json({
