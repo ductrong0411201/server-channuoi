@@ -1,12 +1,12 @@
 module.exports = function (req, res, next) {
-  const { mobile, name, password } = req.body;
+  const { mobile, name, password, role } = req.body;
 
   function validmobile(usermobile) {
     return /^\d+$/.test(usermobile);
   }
 
   if (req.path === "/register") {
-    if (![mobile, name, password].every(Boolean)) {
+    if (![mobile, name, password, role].every(Boolean)) {
       return res
         .status(400)
         .json({ status: 400, message: "Thiếu thông tin xác thực" });
