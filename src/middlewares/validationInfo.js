@@ -2,7 +2,7 @@ module.exports = function (req, res, next) {
   const { mobile, name, password, role } = req.body;
 
   function validmobile(usermobile) {
-    return /^\d+$/.test(usermobile);
+    return /^\d{10}$/.test(usermobile);
   }
 
   if (req.path === "/register") {
@@ -13,7 +13,7 @@ module.exports = function (req, res, next) {
     } else if (!validmobile(mobile)) {
       return res
         .status(400)
-        .json({ status: 400, message: "Số điện thoại chỉ có thể là số" });
+        .json({ status: 400, message: "Số điện thoại phải là số và có 10 kí tự" });
     }
   } else if (req.path === "/login") {
     if (![mobile, password].every(Boolean)) {

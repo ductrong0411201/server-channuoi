@@ -61,7 +61,6 @@ exports.login = async (req, res) => {
     const token = jwtGenerator(user.id);
     return (
       res
-        // .cookie("token", token, { httpOnly: true })
         .json({ status: 200, message: "Success", token: token })
     );
   } catch (err) {
@@ -165,6 +164,7 @@ exports.getUserInfo = async (req, res) => {
     if (!user) {
       return res.status(404).json({ status: 404, error: "User not found" });
     }
+    console.log(user);
     res.json(user);
   } catch (err) {
     console.error(err.message);

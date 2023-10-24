@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       name: DataTypes.STRING,
       mobile: DataTypes.STRING,
       email: DataTypes.STRING,
+      address: DataTypes.STRING,
       password: { type: DataTypes.STRING, validate: { len: [6, 64] } },
       role_id: {
         type: DataTypes.SMALLINT,
