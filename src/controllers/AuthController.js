@@ -26,7 +26,7 @@ exports.store = async (req, res) => {
       name,
       mobile,
       password: hashed_password,
-      role: ROLE[role],
+      role_id: ROLE[role],
     });
     res.status(200).json({
       status: 200,
