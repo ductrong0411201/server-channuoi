@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
      */
 
     static associate(models) {
+      this.hasMany(models.Report, {
+        foreignKey: "created_by",
+        as: "reports",
+      });
       this.belongsTo(models.Role, {
         foreignKey: "role_id",
         as: "role",
@@ -30,7 +34,6 @@ module.exports = (sequelize, DataTypes) => {
       password: { type: DataTypes.STRING, validate: { len: [6, 64] } },
       role_id: {
         type: DataTypes.SMALLINT,
-        defaultValue: 2,
         references: { model: "roles", key: "id" },
       },
       deletedAt: {
