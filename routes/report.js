@@ -2,7 +2,23 @@ const express = require("express");
 const router = express.Router();
 const ReportController = require("../src/controllers/ReportController");
 const auth = require("../src/middlewares/authorizeMiddleware");
+const multer = require("multer");
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "./storage");
+    },
+    filename: (req, file, cb) => {
+      cb(null, Date.now() + "-" + file.originalname);
+    },
+  });
+  
+  const upload = multer({ storage: storage });
+
 
 router.post("/reports", auth, ReportController.store);
+
+router.post("/upload-image", upload.single('image') , ReportController.uploadImage);
+
+router.post("/upload-image-mutiple", upload.array('images', 4) , ReportController.uploadImage);
 
 module.exports = router;

@@ -1,17 +1,7 @@
 const { Report } = require("../models");
 const moment = require("moment");
 require("dotenv").config();
-const multer = require("multer");
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "../../storage");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
 
-const upload = multer({ storage: storage });
 exports.store = async (req, res) => {
   try {
     let {
@@ -48,5 +38,5 @@ exports.store = async (req, res) => {
 };
 
 exports.uploadImage = (req, res) => {
-  upload.single("image");
+  res.status(200).json(req.file);
 };
