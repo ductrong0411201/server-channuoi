@@ -17,6 +17,8 @@ const storage = multer.diskStorage({
 
 router.post("/reports", auth, ReportController.store);
 
+router.post("/reports/:id/approved", auth, ReportController.approveReport);
+
 router.post("/upload-image", upload.single('image') , ReportController.uploadImage);
 
 router.post("/upload-image-mutiple", upload.array('images', 4) , ReportController.uploadImage);

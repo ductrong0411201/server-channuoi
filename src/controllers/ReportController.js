@@ -1,4 +1,4 @@
-const { Report } = require("../models");
+const { Report, User } = require("../models");
 const moment = require("moment");
 require("dotenv").config();
 
@@ -21,12 +21,12 @@ exports.store = async (req, res) => {
     } = req.body;
     date_release = moment(date_release, "DD/MM/YYYY").toDate();
     date_sale = moment(date_sale, "DD/MM/YYYY").toDate();
-    if(date_release > date_sale ) {
+    if (date_release > date_sale) {
       return res.status(400).json({
-      status: 400,
-      message: "Ngày xuất phải muộn hơn ngày thả",
-      })
-    };
+        status: 400,
+        message: "Ngày xuất phải muộn hơn ngày thả",
+      });
+    }
     const new_report = await Report.create({
       num_livestock,
       date_release,
@@ -52,4 +52,22 @@ exports.store = async (req, res) => {
 
 exports.uploadImage = (req, res) => {
   res.status(200).json(req.file);
+};
+
+exports.approveReport = async (req, res) => {
+  const user = await User.findOne({ where: { id: req.user.id } });
+  if (user.role_id != 1 || user.role_id != 2) {
+    return res.status(403).json({
+      status: 403,
+      message: "Bạn không có quyền",
+    });
+  }
+  const report = await Report.findOne({ where: { id: req.params.id } });
+  report.update({
+    approved: true,
+  });
+  res.status(200).json({
+    status: 200,
+    message: "Thành công",
+  });
 };
