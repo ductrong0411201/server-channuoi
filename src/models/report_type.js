@@ -12,7 +12,6 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.hasMany(models.Report, {
         foreignKey: "type_id",
-        as: "reports",
       });
     }
   }
@@ -28,7 +27,9 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     sequelize,
+    timestamps: false,
     modelName: 'ReportType',
+    tableName: "report_type",
   });
   return ReportType;
 };

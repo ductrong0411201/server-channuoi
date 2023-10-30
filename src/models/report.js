@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       });
       this.belongsTo(models.ReportType, {
         foreignKey: "type_id",
-        as: "type",
+        as: 'type'
       });
     }
   }

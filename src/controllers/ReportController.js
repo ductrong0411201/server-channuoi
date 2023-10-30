@@ -1,4 +1,4 @@
-const { Report, User } = require("../models");
+const { Report, User, ReportType } = require("../models");
 const moment = require("moment");
 require("dotenv").config();
 
@@ -55,19 +55,48 @@ exports.uploadImage = (req, res) => {
 };
 
 exports.approveReport = async (req, res) => {
-  const user = await User.findOne({ where: { id: req.user.id } });
-  if (user.role_id != 1 || user.role_id != 2) {
-    return res.status(403).json({
-      status: 403,
-      message: "Bạn không có quyền",
+  try {
+    const user = await User.findOne({ where: { id: req.user.id } });
+    if (user.role_id != 1 || user.role_id != 2) {
+      return res.status(403).json({
+        status: 403,
+        message: "Bạn không có quyền",
+      });
+    }
+    const report = await Report.findOne({ where: { id: req.params.id } });
+    report.update({
+      approved: true,
+    });
+    res.status(200).json({
+      status: 200,
+      message: "Thành công",
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: "Server error",
     });
   }
-  const report = await Report.findOne({ where: { id: req.params.id } });
-  report.update({
-    approved: true,
-  });
-  res.status(200).json({
-    status: 200,
-    message: "Thành công",
-  });
+};
+
+exports.newReport = async (req, res) => {
+  try {
+    const report = await Report.findAll({
+      limit: 10,
+      order: [["createdAt", "DESC"]],
+      include: [{ model: ReportType, as: 'type'}],
+    });
+
+    res.status(200).json({
+      status: 200,
+      message: "Thành công",
+      data: report,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      status: 500,
+      message: "Server error",
+    });
+  }
 };
