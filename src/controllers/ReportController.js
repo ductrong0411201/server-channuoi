@@ -100,12 +100,10 @@ exports.newReport = async (req, res) => {
   }
 };
 
-exports.nhanongReport = async (req, res) => {
+exports.reportByRole = async (req, res) => {
   try {
-    console.log(req.query);
     const { role } = req.query;
     const reports = await Report.findAll({
-      limit: 10,
       order: [["createdAt", "DESC"]],
       include: [
         { model: ReportType, as: "type" },
@@ -113,7 +111,7 @@ exports.nhanongReport = async (req, res) => {
           model: User,
           as: "user_create",
           where: {
-            role_id: role,
+            role_id: role !== "" ? role : req.user.id,
           },
         },
       ],

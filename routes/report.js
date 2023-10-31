@@ -5,7 +5,7 @@ const auth = require("../src/middlewares/authorizeMiddleware");
 const multer = require("multer");
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./storage");
+    cb(null, "./storage/images");
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + "-" + file.originalname);
@@ -16,7 +16,7 @@ const upload = multer({ storage: storage });
 
 router.get("/new-reports", auth, ReportController.newReport);
 
-router.get("/nhanong-reports", auth, ReportController.nhanongReport);
+router.get("/list-reports", auth, ReportController.reportByRole);
 
 router.post("/reports", auth, ReportController.store);
 
