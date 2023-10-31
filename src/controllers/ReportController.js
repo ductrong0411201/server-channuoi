@@ -42,7 +42,7 @@ exports.store = async (req, res) => {
       data: new_report,
     });
   } catch (err) {
-    console.error(err.message);
+    console.error(err);
     res.status(500).json({
       status: 500,
       message: "Server error",
@@ -85,6 +85,38 @@ exports.newReport = async (req, res) => {
       limit: 10,
       order: [["createdAt", "DESC"]],
       include: [{ model: ReportType, as: "type" }],
+    });
+    res.status(200).json({
+      status: 200,
+      message: "Thành công",
+      data: reports,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      status: 500,
+      message: "Server error",
+    });
+  }
+};
+
+exports.nhanongReport = async (req, res) => {
+  try {
+    console.log(req.query);
+    const { role } = req.query;
+    const reports = await Report.findAll({
+      limit: 10,
+      order: [["createdAt", "DESC"]],
+      include: [
+        { model: ReportType, as: "type" },
+        {
+          model: User,
+          as: "user_create",
+          where: {
+            role_id: role,
+          },
+        },
+      ],
     });
     res.status(200).json({
       status: 200,

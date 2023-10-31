@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
       description: DataTypes.TEXT,
       image_path: DataTypes.STRING,
       created_by: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         references: { model: "users", key: "id" },
       },
       type_id: {

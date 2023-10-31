@@ -19,7 +19,6 @@ module.exports = {
       "users",
       [
         {
-          id: uuidv4(),
           name: "Đức Trọng",
           mobile: "0355898753",
           email: "ductronglu0411@gmail.com",

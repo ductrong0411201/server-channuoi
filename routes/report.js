@@ -16,6 +16,8 @@ const upload = multer({ storage: storage });
 
 router.get("/new-reports", auth, ReportController.newReport);
 
+router.get("/nhanong-reports", auth, ReportController.nhanongReport);
+
 router.post("/reports", auth, ReportController.store);
 
 router.post("/reports/:id/approved", auth, ReportController.approveReport);

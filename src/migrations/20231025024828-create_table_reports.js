@@ -37,7 +37,7 @@ module.exports = {
         allowNull: true,
       },
       created_by: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
       type_id: {
