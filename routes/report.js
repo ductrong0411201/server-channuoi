@@ -18,6 +18,8 @@ router.get("/new-reports", auth, ReportController.newReport);
 
 router.get("/list-reports", auth, ReportController.reportByRole);
 
+router.get("/list-reports-by-user", auth, ReportController.reportByUser);
+
 router.post("/reports", auth, ReportController.store);
 
 router.post("/reports/:id/approved", auth, ReportController.approveReport);

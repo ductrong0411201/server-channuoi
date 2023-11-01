@@ -111,10 +111,36 @@ exports.reportByRole = async (req, res) => {
           model: User,
           as: "user_create",
           where: {
-            role_id: role !== "" ? role : req.user.id,
+            role_id: role,
           },
         },
       ],
+    });
+    res.status(200).json({
+      status: 200,
+      message: "Thành công",
+      data: reports,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      status: 500,
+      message: "Server error",
+    });
+  }
+};
+
+exports.reportByUser = async (req, res) => {
+  try {
+    const { role } = req.query;
+    const reports = await Report.findAll({
+      order: [["createdAt", "DESC"]],
+      where: [
+        {
+          created_by: req.user.id,
+        },
+      ],
+      include: [{ model: ReportType, as: "type" }],
     });
     res.status(200).json({
       status: 200,
