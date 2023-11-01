@@ -57,7 +57,7 @@ exports.uploadImage = (req, res) => {
 exports.approveReport = async (req, res) => {
   try {
     const user = await User.findOne({ where: { id: req.user.id } });
-    if (user.role_id != 1 || user.role_id != 2) {
+    if (user.role_id != 2) {
       return res.status(403).json({
         status: 403,
         message: "Bạn không có quyền",
@@ -156,13 +156,26 @@ exports.reportByUser = async (req, res) => {
   }
 };
 
-function transformDateFormat(inputDate) {
-  const date = new Date(inputDate);
-  const day = date.getUTCDate();
-  const month = date.getUTCMonth() + 1;
-  const year = date.getUTCFullYear();
-  const formattedDay = day < 10 ? `0${day}` : day;
-  const formattedMonth = month < 10 ? `0${month}` : month;
-  const formattedDate = `${formattedDay}-${formattedMonth}-${year}`;
-  return formattedDate;
-}
+exports.show = async (req, res) => {
+  try {
+    const report = await Report.findOne({
+      where: [
+        {
+          id: req.params.id,
+        },
+      ],
+      include: [{ model: ReportType, as: "type" }],
+    });
+    res.status(200).json({
+      status: 200,
+      message: "Thành công",
+      data: report,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      status: 500,
+      message: "Server error",
+    });
+  }
+};

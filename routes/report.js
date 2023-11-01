@@ -22,6 +22,8 @@ router.get("/list-reports-by-user", auth, ReportController.reportByUser);
 
 router.post("/reports", auth, ReportController.store);
 
+router.get("/reports/:id", auth, ReportController.show);
+
 router.post("/reports/:id/approved", auth, ReportController.approveReport);
 
 router.post(
