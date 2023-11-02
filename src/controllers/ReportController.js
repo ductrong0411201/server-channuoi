@@ -56,6 +56,7 @@ exports.uploadImage = (req, res) => {
 
 exports.approveReport = async (req, res) => {
   try {
+    const { approved_description } = req.body;
     const user = await User.findOne({ where: { id: req.user.id } });
     if (user.role_id != 2) {
       return res.status(403).json({
@@ -66,6 +67,7 @@ exports.approveReport = async (req, res) => {
     const report = await Report.findOne({ where: { id: req.params.id } });
     report.update({
       approved: true,
+      approved_description: approved_description,
     });
     res.status(200).json({
       status: 200,
