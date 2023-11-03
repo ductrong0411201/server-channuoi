@@ -5,7 +5,7 @@ const auth = require("../src/middlewares/authorizeMiddleware");
 const multer = require("multer");
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./storage/images");
+    cb(null, "./storage");
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + "-" + file.originalname);
