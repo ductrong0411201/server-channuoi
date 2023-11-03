@@ -64,6 +64,12 @@ exports.approveReport = async (req, res) => {
         message: "Bạn không có quyền",
       });
     }
+    if (approved_description == null || approved_description == "") {
+      return res.status(400).json({
+        status: 400,
+        message: "Cần phải nhập thông tin duyệt",
+      });
+    }
     const report = await Report.findOne({ where: { id: req.params.id } });
     report.update({
       approved: true,
