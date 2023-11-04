@@ -1,7 +1,7 @@
 const { Report, User, ReportType } = require("../models");
 const moment = require("moment");
 require("dotenv").config();
-
+const { getMessaging } = require("firebase-admin/messaging");
 const REPORT_TYPE = {
   "Báo cáo chăn nuôi": 1,
   "Báo cáo môi trường": 2,
@@ -186,4 +186,49 @@ exports.show = async (req, res) => {
       message: "Server error",
     });
   }
+};
+
+function sendNotification(message) {
+  getMessaging()
+    .sendEachForMulticast(message)
+    .then((response) => {
+      if (response.failureCount > 0) {
+        const failedTokens = [];
+        response.responses.forEach((resp, idx) => {
+          if (!resp.success) {
+            failedTokens.push(registrationTokens[idx]);
+          }
+        });
+        console.log("List of tokens that caused failures: " + failedTokens);
+      }
+    });
+}
+
+exports.test = async (req, res) => {
+  const receivedToken =
+    "c7sAed1mTgq79RQEcNghEJ:APA91bHnaip1aqXw8PSILeXr-TxqBReywhtcsv7o1URx0ejVMjW0DkvvbZ4Cv9pyyIow6m0sKYgo85A-ZfMlkiWWnOgp13IcUFoCl3rrtqhpxA02jgNLSAIK0cqYc7mHvVvhDrA9mf9j";
+  // return receivedToken;
+  console.log('hi');
+  const message = {
+    notification: {
+      title: "Notification",
+      body: "This is a Test Notification",
+    },
+    token: receivedToken,
+  };
+
+  getMessaging()
+    .send(message)
+    .then((response) => {
+      res.status(200).json({
+        message: "Successfully sent message",
+        token: receivedToken,
+      });
+      console.log("Successfully sent message:", response);
+    })
+    .catch((error) => {
+      res.status(400);
+      res.send(error);
+      console.log("Error sending message:", error);
+    });
 };
