@@ -1,12 +1,9 @@
 const jwt = require("jsonwebtoken");
 
 module.exports = function (req, res, next) {
-  console.log(req.headers.authorization);
   let token = req.headers.authorization;
-  // token = token.replace(/Bearer\s+/, "");
-  console.log(1,token);
+  token = token.replace(/Bearer\s+/, "");
   if (!token) {
-    console.log(123);
     return res
       .status(403)
       .json({ status: 403, message: "Bạn không có quyền truy cập" });

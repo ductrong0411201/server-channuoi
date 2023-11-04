@@ -38,6 +38,5 @@ router.post(
   ReportController.uploadImage
 );
 
-router.get("/test-noti", ReportController.test);
 
 module.exports = router;

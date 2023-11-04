@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.belongsTo(models.User, {
-        foreignKey: "created_by",
+        foreignKey: "from",
         as: "from_user",
       });
       this.belongsTo(models.Report, {

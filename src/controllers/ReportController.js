@@ -1,7 +1,15 @@
-const { Report, User, ReportType } = require("../models");
+const {
+  Report,
+  User,
+  ReportType,
+  Notification,
+  DeviceToken,
+} = require("../models");
 const moment = require("moment");
 require("dotenv").config();
 const { getMessaging } = require("firebase-admin/messaging");
+const Sequelize = require("sequelize");
+
 const REPORT_TYPE = {
   "Báo cáo chăn nuôi": 1,
   "Báo cáo môi trường": 2,
@@ -36,10 +44,32 @@ exports.store = async (req, res) => {
       type_id: REPORT_TYPE[type],
       created_by: req.user.id,
     });
+    const titleNotification = "Báo cáo mới";
+    const new_notification = await Notification.create({
+      title: titleNotification,
+      body: type,
+      from: req.user.id,
+      report_id: new_report.id,
+    });
+    const devices = await DeviceToken.findAll({
+      where: {
+        active: true,
+      },
+      include: [
+        {
+          model: User,
+          as: "user_device",
+          attributes: [],
+          where: { role_id: { [Sequelize.Op.in]: [2, 4] } },
+        },
+      ],
+    });
+    const deviceTokens = devices.map((device) => device.token);
+    sendNotification(deviceTokens, titleNotification, type);
     res.status(200).json({
       status: 200,
       message: "Thành công",
-      data: new_report,
+      data: deviceTokens,
     });
   } catch (err) {
     console.error(err);
@@ -75,6 +105,21 @@ exports.approveReport = async (req, res) => {
       approved: true,
       approved_description: approved_description,
     });
+    const titleNotification = "Báo cáo đã được duyệt";
+    const new_notification = await Notification.create({
+      title: titleNotification,
+      body: type,
+      from: req.user.id,
+      report_id: report.id,
+    });
+    const devices = await DeviceToken.findAll({
+      where: {
+        active: true,
+        user_id: report.created_by
+      },
+    });
+    const deviceTokens = devices.map((device) => device.token);
+    sendNotification(deviceTokens, titleNotification, type);
     res.status(200).json({
       status: 200,
       message: "Thành công",
@@ -225,30 +270,3 @@ function sendNotification(registrationTokens, title, body) {
     });
 }
 
-exports.test = async (req, res) => {
-  const receivedToken =
-    "c7sAed1mTgq79RQEcNghEJ:APA91bHnaip1aqXw8PSILeXr-TxqBReywhtcsv7o1URx0ejVMjW0DkvvbZ4Cv9pyyIow6m0sKYgo85A-ZfMlkiWWnOgp13IcUFoCl3rrtqhpxA02jgNLSAIK0cqYc7mHvVvhDrA9mf9j";
-  // return receivedToken;
-  const message = {
-    notification: {
-      title: "Notification",
-      body: "This is a Test Notification",
-    },
-    token: receivedToken,
-  };
-
-  getMessaging()
-    .send(message)
-    .then((response) => {
-      res.status(200).json({
-        message: "Successfully sent message",
-        token: receivedToken,
-      });
-      console.log("Successfully sent message:", response);
-    })
-    .catch((error) => {
-      res.status(400);
-      res.send(error);
-      console.log("Error sending message:", error);
-    });
-};
