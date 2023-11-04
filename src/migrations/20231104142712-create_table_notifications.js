@@ -1,32 +1,36 @@
-"use strict";
+'use strict';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  async up (queryInterface, Sequelize) {
     /**
      * Add altering commands here.
      *
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    return queryInterface.createTable("device_token", {
+    return queryInterface.createTable("notifications", {
       id: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.INTEGER,
         autoIncrement: true,
       },
-      token: {
+      title: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      user_id: {
+      body: {
+        type: Sequelize.STRING,
+        defaultValue: true,
+      },
+      from: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      active: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: true,
+      report_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
       },
       createdAt: {
         allowNull: false,
@@ -41,13 +45,13 @@ module.exports = {
     });
   },
 
-  async down(queryInterface, Sequelize) {
+  async down (queryInterface, Sequelize) {
     /**
      * Add reverting commands here.
      *
      * Example:
      * await queryInterface.dropTable('users');
      */
-    return queryInterface.dropTable("device_token");
-  },
+    return queryInterface.dropTable("notifications");
+  }
 };

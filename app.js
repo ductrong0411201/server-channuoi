@@ -9,6 +9,7 @@ const indexRouter = require("./routes/index");
 const authRouter = require("./routes/auth");
 const userRouter = require("./routes/user");
 const reportRouter = require("./routes/report");
+const notificationRouter = require("./routes/notification");
 const app = express();
 const { initializeApp, applicationDefault } = require("firebase-admin/app");
 // view engine setup
@@ -29,6 +30,7 @@ app.use("/", indexRouter);
 app.use("/auth", authRouter);
 app.use("/", userRouter);
 app.use("/", reportRouter);
+app.use("/", notificationRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));

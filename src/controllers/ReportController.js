@@ -172,7 +172,22 @@ exports.show = async (req, res) => {
           id: req.params.id,
         },
       ],
-      include: [{ model: ReportType, as: "type" }],
+      include: [
+        { model: ReportType, as: "type" },
+        {
+          model: User,
+          as: "user_create",
+          attributes: {
+            exclude: [
+              "password",
+              "role_id",
+              "deletedAt",
+              "createdAt",
+              "updatedAt",
+            ],
+          },
+        },
+      ],
     });
     res.status(200).json({
       status: 200,
@@ -188,9 +203,16 @@ exports.show = async (req, res) => {
   }
 };
 
-function sendNotification(message) {
+function sendNotification(registrationTokens, title, body) {
+  const message = {
+    notification: {
+      title: title,
+      body: body,
+    },
+    tokens: registrationTokens,
+  };
   getMessaging()
-    .sendEachForMulticast(message)
+    .sendMulticast(message)
     .then((response) => {
       if (response.failureCount > 0) {
         const failedTokens = [];
@@ -199,7 +221,6 @@ function sendNotification(message) {
             failedTokens.push(registrationTokens[idx]);
           }
         });
-        console.log("List of tokens that caused failures: " + failedTokens);
       }
     });
 }
@@ -208,7 +229,6 @@ exports.test = async (req, res) => {
   const receivedToken =
     "c7sAed1mTgq79RQEcNghEJ:APA91bHnaip1aqXw8PSILeXr-TxqBReywhtcsv7o1URx0ejVMjW0DkvvbZ4Cv9pyyIow6m0sKYgo85A-ZfMlkiWWnOgp13IcUFoCl3rrtqhpxA02jgNLSAIK0cqYc7mHvVvhDrA9mf9j";
   // return receivedToken;
-  console.log('hi');
   const message = {
     notification: {
       title: "Notification",
