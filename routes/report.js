@@ -20,7 +20,11 @@ router.post("/reports", auth, ReportController.store);
 
 router.get("/reports/:id", auth, ReportController.show);
 
+router.get("/report-by-role/:role", auth, ReportController.reportByRole);
+
 router.post("/reports/:id/approved", auth, ReportController.approveReport);
+
+
 
 router.post(
   "/upload-image",
@@ -33,6 +37,5 @@ router.post(
   upload.array("images", 4),
   ReportController.uploadImage
 );
-
 
 module.exports = router;

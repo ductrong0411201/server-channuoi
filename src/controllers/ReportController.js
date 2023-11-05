@@ -224,6 +224,36 @@ exports.show = async (req, res) => {
   }
 };
 
+exports.reportByRole = async (req, res) => {
+  try {
+    const { role } = req.params;
+    const reports = await Report.findAll({
+      order: [["createdAt", "DESC"]],
+      include: [
+        { model: ReportType, as: "type" },
+        {
+          model: User,
+          as: "user_create",
+          where: {
+            role_id: role,
+          },
+        },
+      ],
+    });
+    res.status(200).json({
+      status: 200,
+      message: "Thành công",
+      data: reports,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      status: 500,
+      message: "Server error",
+    });
+  }
+};
+
 function sendNotification(registrationTokens, title, body) {
   const message = {
     notification: {

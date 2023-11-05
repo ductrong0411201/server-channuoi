@@ -142,3 +142,25 @@ exports.markReadNoti = async (req, res) => {
     });
   }
 };
+
+exports.countNotifications = async (req, res) => {
+  try {
+    const count = await Notification.count({
+      where: {
+        to: req.user.id,
+        seen: false,
+      },
+    });
+    res.status(200).json({
+      status: 200,
+      message: "Thành công",
+      count: count,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      status: 500,
+      message: "Server error",
+    });
+  }
+};

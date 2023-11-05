@@ -15,4 +15,6 @@ router.get("/notifications-by-user", auth, NotificationController.notificationBy
 
 router.get("/mark-read/:id", auth, NotificationController.markReadNoti);
 
+router.get("/count-notifications", auth, NotificationController.countNotifications);
+
 module.exports = router;
