@@ -70,16 +70,21 @@ exports.store = async (req, res) => {
       ],
     });
     if (devices.length > 0) {
+      let users = [];
       const deviceTokens = [];
       const titleNotification = "Báo cáo mới";
       devices.forEach(async (e) => {
         deviceTokens.push(e.token);
+        users.push(e.user_id);
+      });
+      users = [...new Set(users)];
+      users.forEach(async (e) => {
         const new_notification = await Notification.create({
           title: titleNotification,
           body: type,
           from: req.user.id,
           report_id: new_report.id,
-          to: e.user_id,
+          to: e,
         });
       });
       sendNotification(deviceTokens, titleNotification, type);
@@ -132,11 +137,17 @@ exports.approveReport = async (req, res) => {
         user_id: report.created_by,
       },
     });
+    let users = [];
     if (devices.length > 0) {
       const deviceTokens = [];
+      
       const titleNotification = "Báo cáo đã được duyệt";
-      devices.forEach(async (e) => {
+      devices.forEach((e) => {
         deviceTokens.push(e.token);
+        users.push(e.user_id);
+      });
+      users = [...new Set(users)];
+      users.forEach(async (e) => {
         const new_notification = await Notification.create({
           title: titleNotification,
           body: report.type.dataValues.type,
@@ -154,6 +165,7 @@ exports.approveReport = async (req, res) => {
     res.status(200).json({
       status: 200,
       message: "Thành công",
+      data: users
     });
   } catch (error) {
     console.log(error);
