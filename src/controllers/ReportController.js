@@ -44,12 +44,15 @@ exports.store = async (req, res) => {
       type_id: REPORT_TYPE[type],
       created_by: req.user.id,
     });
-    const titleNotification = "Báo cáo mới";
-    const new_notification = await Notification.create({
-      title: titleNotification,
+    const noti_success = await Notification.create({
+      title: "Báo cáo đã gửi",
       body: type,
       from: req.user.id,
       report_id: new_report.id,
+      to: req.user.id,
+    });
+    const user = await User.findOne({
+      id: req.user.id,
     });
     const devices = await DeviceToken.findAll({
       where: {
@@ -60,16 +63,30 @@ exports.store = async (req, res) => {
           model: User,
           as: "user_device",
           attributes: [],
-          where: { role_id: { [Sequelize.Op.in]: [2, 4] } },
+          where: {
+            role_id: { [Sequelize.Op.in]: user.role_id == 3 ? [2, 4] : [2] },
+          },
         },
       ],
     });
-    const deviceTokens = devices.map((device) => device.token);
-    sendNotification(deviceTokens, titleNotification, type);
+    if (devices.length > 0) {
+      const deviceTokens = [];
+      const titleNotification = "Báo cáo mới";
+      devices.forEach(async (e) => {
+        deviceTokens.push(e.token);
+        const new_notification = await Notification.create({
+          title: titleNotification,
+          body: type,
+          from: req.user.id,
+          report_id: new_report.id,
+          to: e.user_id,
+        });
+      });
+      sendNotification(deviceTokens, titleNotification, type);
+    }
     res.status(200).json({
       status: 200,
       message: "Thành công",
-      data: deviceTokens,
     });
   } catch (err) {
     console.error(err);
@@ -100,31 +117,46 @@ exports.approveReport = async (req, res) => {
         message: "Cần phải nhập thông tin duyệt",
       });
     }
-    const report = await Report.findOne({ where: { id: req.params.id } });
+    const report = await Report.findOne({
+      where: { id: req.params.id },
+      include: [{ model: ReportType, as: "type" }],
+    });
     report.update({
       approved: true,
       approved_description: approved_description,
     });
-    const titleNotification = "Báo cáo đã được duyệt";
-    const new_notification = await Notification.create({
-      title: titleNotification,
-      body: type,
-      from: req.user.id,
-      report_id: report.id,
-    });
+
     const devices = await DeviceToken.findAll({
       where: {
         active: true,
-        user_id: report.created_by
+        user_id: report.created_by,
       },
     });
-    const deviceTokens = devices.map((device) => device.token);
-    sendNotification(deviceTokens, titleNotification, type);
+    if (devices.length > 0) {
+      const deviceTokens = [];
+      const titleNotification = "Báo cáo đã được duyệt";
+      devices.forEach(async (e) => {
+        deviceTokens.push(e.token);
+        const new_notification = await Notification.create({
+          title: titleNotification,
+          body: report.type.dataValues.type,
+          from: req.user.id,
+          report_id: report.id,
+          to: e.user_id,
+        });
+      });
+      sendNotification(
+        deviceTokens,
+        titleNotification,
+        report.type.dataValues.type
+      );
+    }
     res.status(200).json({
       status: 200,
       message: "Thành công",
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       status: 500,
       message: "Server error",
@@ -137,62 +169,6 @@ exports.newReport = async (req, res) => {
     const reports = await Report.findAll({
       limit: 10,
       order: [["createdAt", "DESC"]],
-      include: [{ model: ReportType, as: "type" }],
-    });
-    res.status(200).json({
-      status: 200,
-      message: "Thành công",
-      data: reports,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      status: 500,
-      message: "Server error",
-    });
-  }
-};
-
-exports.reportByRole = async (req, res) => {
-  try {
-    const { role } = req.query;
-    const reports = await Report.findAll({
-      order: [["createdAt", "DESC"]],
-      include: [
-        { model: ReportType, as: "type" },
-        {
-          model: User,
-          as: "user_create",
-          where: {
-            role_id: role,
-          },
-        },
-      ],
-    });
-    res.status(200).json({
-      status: 200,
-      message: "Thành công",
-      data: reports,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      status: 500,
-      message: "Server error",
-    });
-  }
-};
-
-exports.reportByUser = async (req, res) => {
-  try {
-    const { role } = req.query;
-    const reports = await Report.findAll({
-      order: [["createdAt", "DESC"]],
-      where: [
-        {
-          created_by: req.user.id,
-        },
-      ],
       include: [{ model: ReportType, as: "type" }],
     });
     res.status(200).json({
@@ -269,4 +245,3 @@ function sendNotification(registrationTokens, title, body) {
       }
     });
 }
-

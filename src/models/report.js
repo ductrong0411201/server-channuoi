@@ -40,6 +40,7 @@ module.exports = (sequelize, DataTypes) => {
         references: { model: "reports", key: "id" },
       },
       approved: DataTypes.BOOLEAN,
+      approved_description: DataTypes.TEXT,
     },
     {
       sequelize,

@@ -12,9 +12,13 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "from",
         as: "from_user",
       });
+      this.belongsTo(models.User, {
+        foreignKey: "to",
+        as: "to_user",
+      });
       this.belongsTo(models.Report, {
         foreignKey: "report_id",
-        as: 'report'
+        as: "report",
       });
     }
   }
@@ -36,6 +40,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         references: { model: "reports", key: "id" },
       },
+      to: {
+        type: DataTypes.INTEGER,
+        references: { model: "users", key: "id" },
+      },
+      seen: DataTypes.BOOLEAN,
     },
     {
       sequelize,

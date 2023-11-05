@@ -16,10 +16,6 @@ const upload = multer({ storage: storage });
 
 router.get("/new-reports", auth, ReportController.newReport);
 
-router.get("/list-reports", auth, ReportController.reportByRole);
-
-router.get("/list-reports-by-user", auth, ReportController.reportByUser);
-
 router.post("/reports", auth, ReportController.store);
 
 router.get("/reports/:id", auth, ReportController.show);
