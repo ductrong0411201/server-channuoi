@@ -9,8 +9,10 @@ router.post("/device", auth, DeviceTokenController.newDevice);
 
 router.delete("/device", auth, DeviceTokenController.removeDevice);
 
-router.get("/reports-by-role/:role", auth, NotificationController.notificationByRole);
+router.get("/notifications-by-role/:role", auth, NotificationController.notificationByRole);
 
-router.get("/reports-by-user", auth, NotificationController.notificationByUser);
+router.get("/notifications-by-user", auth, NotificationController.notificationByUser);
+
+router.get("/mark-read/:id", auth, NotificationController.markReadNoti);
 
 module.exports = router;
