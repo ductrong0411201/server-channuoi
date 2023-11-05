@@ -45,14 +45,14 @@ exports.store = async (req, res) => {
       created_by: req.user.id,
     });
     const noti_success = await Notification.create({
-      title: "Báo cáo đã gửi",
+      title: "Báo cáo đã được gửi",
       body: type,
       from: req.user.id,
       report_id: new_report.id,
       to: req.user.id,
     });
-    const user = await User.findOne({
-      id: req.user.id,
+    const currUser = await User.findOne({
+      where: { id: req.user.id },
     });
     const devices = await DeviceToken.findAll({
       where: {
@@ -62,9 +62,11 @@ exports.store = async (req, res) => {
         {
           model: User,
           as: "user_device",
-          attributes: [],
+          // attributes: [],
           where: {
-            role_id: { [Sequelize.Op.in]: user.role_id == 3 ? [2, 4] : [2] },
+            role_id: {
+              [Sequelize.Op.in]: currUser.role_id == 3 ? [2, 4] : [2],
+            },
           },
         },
       ],
@@ -140,7 +142,7 @@ exports.approveReport = async (req, res) => {
     let users = [];
     if (devices.length > 0) {
       const deviceTokens = [];
-      
+
       const titleNotification = "Báo cáo đã được duyệt";
       devices.forEach((e) => {
         deviceTokens.push(e.token);
@@ -153,7 +155,7 @@ exports.approveReport = async (req, res) => {
           body: report.type.dataValues.type,
           from: req.user.id,
           report_id: report.id,
-          to: e.user_id,
+          to: e,
         });
       });
       sendNotification(
@@ -165,7 +167,7 @@ exports.approveReport = async (req, res) => {
     res.status(200).json({
       status: 200,
       message: "Thành công",
-      data: users
+      data: users,
     });
   } catch (error) {
     console.log(error);

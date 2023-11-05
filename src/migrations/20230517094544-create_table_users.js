@@ -16,7 +16,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         autoIncrement: true,
       },
-      token: {
+      name: {
         type: Sequelize.STRING,
         allowNull: false,
       },
